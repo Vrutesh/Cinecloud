@@ -44,14 +44,12 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
       mainContainer.appendChild(gradientOverlay);
     }
 
-    if(categoryName === "Upcoming Movies"){
-      categoryHeading.id = "popular"
-    }
-    else if(categoryName === "Top Rated TV Shows"){
-      categoryHeading.id = "tvshows"
-    }
-    else if(categoryName === "Now Playing Movies"){
-      categoryHeading.id = "now-playing"
+    if (categoryName === "Upcoming Movies") {
+      categoryHeading.id = "popular";
+    } else if (categoryName === "Top Rated TV Shows") {
+      categoryHeading.id = "tvshows";
+    } else if (categoryName === "Now Playing Movies") {
+      categoryHeading.id = "now-playing";
     }
 
     if (categoryName === "Popular TV Shows") {
@@ -60,7 +58,6 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
 
       const video_container = document.createElement("div");
       video_container.classList.add("video-container");
-
 
       const video_container_iframe = document.createElement("iframe");
       video_container_iframe.classList.add("trailer-video");
@@ -130,8 +127,6 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
       } else {
         movieRating.textContent = "";
       }
-
-     
 
       const movieTitle = document.createElement("h4");
       movieTitle.classList.add("cardTitle");
@@ -285,7 +280,12 @@ const movie_Info = (title, overview, language, popularity, release) => {
 
   const movieTitle = document.createElement("h1");
   movieTitle.classList.add("title");
-  movieTitle.textContent = title;
+  let titleWords = title.split(" ");
+  if (titleWords.length > 5) {
+    movieTitle.textContent = titleWords.slice(0, 6).join(" ") + "...";
+  } else {
+    movieTitle.textContent = title;
+  }
 
   const movieOverview = document.createElement("h3");
   movieOverview.classList.add("overview");
@@ -305,10 +305,18 @@ const movie_Info = (title, overview, language, popularity, release) => {
   const movie_lang = document.createElement("li");
   movie_lang.classList.add("language");
 
-  if (language === "hi") language = "Hindi";
-  else if (language === "en") language = "English";
+  const languageMap = {
+    hi: "Hindi",
+    en: "English",
+    ta: "Tamil",
+    te: "Telugu",
+    kn: "Kannada",
+    bn: "Bengali",
+  };
 
-  movie_lang.textContent = `Language - ${language}`;
+  const languages = languageMap[language] || language;
+
+  movie_lang.textContent = `Language - ${languages}`;
 
   const movie_popularity = document.createElement("li");
   movie_popularity.classList.add("popularity");
