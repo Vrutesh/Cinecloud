@@ -632,6 +632,7 @@ footer {
 
   .movie-details h1 {
     font-size: 2rem;
+    text-align: center;
   }
 
   .movie-details h3 {
@@ -642,7 +643,8 @@ footer {
   }
 
   .slide-btns{
-    top: 35%;
+    top: 45%;
+    z-index: 999;
   }
 
   .heading-title h3 {
