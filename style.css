@@ -585,8 +585,14 @@ footer {
     top: 45%;
     z-index: 999;
   }
+  .heading-title {
+    margin-bottom: 0px;
+  }
   .heading-title h3 {
     padding-left: 50px;
+  }
+  .card-container {
+    margin-bottom: 0px;
   }
   .content {
     padding-left: 40px;
