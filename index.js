@@ -18,6 +18,11 @@ const customeUrl = (category, type) => {
   return defaultUrl;
 };
 
+// const videosUrl = (category,movie_id, type) => {
+//   const defaultUrl = `${API_URL}${category}/${movie_id}/${type}?language=en-US&page=1&region=IN&api_key=${API_KEY}`;
+//   return defaultUrl;
+// };
+
 // Default image URL
 const imageURL = (url) => `https://image.tmdb.org/t/p/original${url}`;
 
@@ -131,7 +136,7 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
       const movieTitle = document.createElement("h4");
       movieTitle.classList.add("cardTitle");
       movieTitle.textContent =
-        contentType === "movie" ? item.original_title : item.name;
+        contentType === "movie" ? item.title : item.name;
 
       const watchingnowContainer = document.createElement("div");
       watchingnowContainer.classList.add("watchContainer");
