@@ -1,14 +1,13 @@
-/* Reset styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  text-decoration: none;
   font-family: "Noto Sans", sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
+  margin: 0;
 }
 
 /* Scrollbar styles */
@@ -33,6 +32,9 @@ body {
 
 /* Navigation styles */
 .nav-container {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 3.125em;
   -webkit-backdrop-filter: blur(4px);
@@ -41,9 +43,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: fixed;
   color: #fff;
-  z-index: 4;
+  z-index: 9999;
 }
 
 .nav-logo {
@@ -528,4 +529,73 @@ footer {
   border: 1px solid #ddd;
   border-radius: 4px;
   background-color: #f9f9f9;
+}
+
+@media (max-width: 767px) {
+  .nav-logo {
+    display: none;
+  }
+  .nav-menu {
+    align-items: center;
+  }
+  .nav-menu > ul a {
+    font-size: 0.7rem;
+  }
+  .search-container {
+    display: none;
+  }
+  .slide {
+    height: 100vh;
+  }
+  .movie-details {
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 100vh;
+    width: 100%;
+  }
+  .movie-details h1 {
+    font-size: 2rem;
+  }
+  .movie-details h3 {
+    display: none;
+  }
+  .genre {
+    display: none;
+  }
+  .heading-title h3 {
+    padding-left: 50px;
+  }
+  .content {
+    padding-left: 50px;
+  }
+  /* Mobile Styles (for screens 767px or smaller) */
+}
+@media (max-width: 767px) and (max-width: 767px) {
+  .featuring-container {
+    height: 30vh;
+    width: 100% !important;
+  }
+  .video-container {
+    width: 100%;
+  }
+  .trailer-video {
+    width: 100%;
+  }
+  .poster-container img {
+    width: 100%;
+    height: 100%;
+  }
+  .footer-container {
+    padding: 20px 30px;
+  }
+  .footer-menu {
+    flex: 0 0 40%;
+  }
+  .social-appdownload {
+    gap: 0;
+    margin-top: 20px;
+  }
 }/*# sourceMappingURL=style.css.map */
