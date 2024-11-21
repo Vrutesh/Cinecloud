@@ -47,15 +47,25 @@ body {
   z-index: 4;
 }
 
-.header_logo {
+.nav-logo{
+  display: flex;
+  align-items: center;
   padding: 40px;
+  gap: 5px;
+  > img{
+    width: 40px;
+    height: 40px;
+  }
+
+
+}
+
+
+.header_logo {
   cursor: pointer;
   letter-spacing: 1px;
-
-  &::first-letter {
-    color: #ffc305;
-    font-size: 2.3rem;
-  }
+  text-decoration: none;
+  color: $white-color;
 }
 
 .nav-menu {
@@ -401,6 +411,7 @@ body {
     color: $white-color;
     text-align: center;
     margin-top: 15px;
+    padding: 10px 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
