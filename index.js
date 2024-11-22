@@ -133,6 +133,11 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
         movieRating.textContent = "";
       }
 
+      
+      const movieLang = document.createElement('p')
+      movieLang.classList.add("movie-language")
+      movieLang.textContent = item.original_language
+
       const movieTitle = document.createElement("h4");
       movieTitle.classList.add("cardTitle");
       movieTitle.textContent =
@@ -167,6 +172,7 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
 
       card.appendChild(img);
       card.appendChild(movieRating);
+      card.appendChild(movieLang);
       card.appendChild(movieTitle);
       card.appendChild(watchingnowContainer);
       cardHolder.appendChild(card);
