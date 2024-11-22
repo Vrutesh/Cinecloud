@@ -111,9 +111,7 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
 
       if (item.vote_count <= 0) {
         watchHeading.textContent = "To be Released";
-        watchNowText.textContent = `${(item.vote_count * 3)
-          .toString()
-          .slice(0, 3)}k`;
+        watchNowText.style.display = "none"
       } else {
         watchNowText.textContent = `${(item.vote_count * 3)
           .toString()
