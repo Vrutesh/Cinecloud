@@ -42,11 +42,13 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
     const rightArrow = createRightArrow();
     categoryHeading.appendChild(rightArrow);
 
-    //  Featuring Section
-    if (categoryName === "Popular TV Shows") {
-      const featuring_container = createFeatureSection();
-      mainContainer.appendChild(featuring_container);
+    // Add gradient overlay for "Upcoming Movies" category
+    if (categoryName === "Upcoming Movies") {
+      const gradientOverlay = createGradientOverlay();
+      mainContainer.appendChild(gradientOverlay);
     }
+
+    //  Featuring Section
 
     const cardsWrapper = document.createElement("div");
     cardsWrapper.classList.add("card-container");
@@ -57,14 +59,74 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
     const fragment = document.createDocumentFragment();
 
     for (const item of imageItems) {
-      if (shouldSkip(item, contentType)) return;
+      if (contentType === "movie" && !item.backdrop_path) continue;
+      if (contentType === "person" && !item.profile_path) continue;
+      if (contentType === "tv" && !item.backdrop_path) continue;
+
       const cardHolder = document.createElement("div");
       cardHolder.classList.add("card-holder");
 
-      fragment.appendChild(cardHolder)
+      const card = document.createElement("div");
+      card.classList.add("card");
 
+      const img = document.createElement("img");
+
+      if (contentType === "movie") {
+        img.src = imageURL(item.backdrop_path);
+      } else if (contentType === "person") {
+        img.src = imageURL(item.profile_path);
+      } else if (contentType === "tv") {
+        img.src = imageURL(item.backdrop_path);
+      }
+
+      img.alt = contentType === "movie" ? "Movie Poster" : "Person Poster";
+      img.loading = "lazy";
+
+      const movieRating = document.createElement("p");
+      movieRating.classList.add("movie-rating");
+      if (item.vote_average && item.vote_average !== 0) {
+        movieRating.textContent = item.vote_average.toFixed(1);
+      } else {
+        movieRating.textContent = "";
+      }
       
-      const card = createCard(item, contentType)
+      const movieTitle = document.createElement("h4");
+      movieTitle.classList.add("cardTitle");
+      movieTitle.textContent = contentType === "movie" ? item.title : item.name;
+      
+
+      const watchingnowContainer = document.createElement("div");
+      watchingnowContainer.classList.add("watchContainer");
+
+      const watchNowText = document.createElement("p");
+      watchNowText.classList.add("watch-now");
+
+      const watchHeading = document.createElement("p");
+      watchHeading.classList.add("watch-heading");
+      watchHeading.textContent = "watching now";
+
+      if (contentType === "person") {
+        watchingnowContainer.style.display = "none";
+      }
+
+      if (item.vote_count <= 0) {
+        watchHeading.textContent = "To be Released";
+        watchNowText.textContent = `${(item.vote_count * 3)
+          .toString()
+          .slice(0, 3)}k`;
+      } else {
+        watchNowText.textContent = `${(item.vote_count * 3)
+          .toString()
+          .slice(0, 3)}k`;
+      }
+
+      watchingnowContainer.append(watchNowText, watchHeading);
+
+
+      card.appendChild(img);
+      card.appendChild(movieRating);
+      card.appendChild(movieTitle);
+      card.appendChild(watchingnowContainer);
       cardHolder.appendChild(card);
       fragment.appendChild(cardHolder);
     }
@@ -122,12 +184,6 @@ const createCategoryHeading = (categoryName) => {
   categoryHeading.textContent = categoryName;
 
   if (categoryName === "Upcoming Movies") {
-    const gradientOverlay = document.createElement("div");
-    gradientOverlay.classList.add("gradient");
-    mainContainer.appendChild(gradientOverlay);
-  }
-
-  if (categoryName === "Upcoming Movies") {
     categoryHeading.id = "popular";
   } else if (categoryName === "Top Rated TV Shows") {
     categoryHeading.id = "tvshows";
@@ -136,6 +192,13 @@ const createCategoryHeading = (categoryName) => {
   }
 
   return categoryHeading;
+};
+
+// Helper function to create gradient overlay for upcoming movies
+const createGradientOverlay = () => {
+  const gradientOverlay = document.createElement("div");
+  gradientOverlay.classList.add("gradient");
+  return gradientOverlay;
 };
 
 // create right arrow
@@ -180,79 +243,208 @@ const createFeatureSection = () => {
   return featuring_container;
 };
 
-const shouldSkip = (item, contentType) => {
-  if (contentType === "movie" && !item.backdrop_path) return true;
-  if (contentType === "person" && !item.profile_path) return true;
-  if (contentType === "tv" && !item.backdrop_path) return true;
-  return false;
+// fetching carousel data
+
+const carousel = document.querySelector(".carousel");
+
+const fetchCarousel = async (url) => {
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("There is some error");
+    }
+
+    const data = await response.json();
+    const carouselArray = data.results;
+
+    if (!carouselArray || carouselArray.length === 0) return;
+
+    const imageArray = carouselArray.filter((movie) => movie.backdrop_path);
+
+    const fragment = document.createDocumentFragment();
+
+    const createCarouselImage = (images) => {
+      images.forEach((movie, index) => {
+        const slides = document.createElement("div");
+        slides.classList.add("slide");
+
+        if (index === 0) slides.classList.add("active");
+
+        const img = document.createElement("img");
+        img.src = imageURL(movie.backdrop_path);
+        img.classList.add("carousel-img");
+        img.alt = "Movie-Poster";
+        img.loading = "lazy";
+
+        slides.appendChild(img);
+        slides.appendChild(
+          movie_Info(
+            movie.title,
+            movie.overview,
+            movie.original_language,
+            movie.popularity,
+            movie.release_date
+          )
+        );
+        fragment.appendChild(slides);
+      });
+    };
+    createCarouselImage(imageArray);
+    carousel.appendChild(fragment);
+  } catch (error) {
+    console.log("There is an error in fetching data:", error);
+  }
 };
 
-const createCard = (item, contentType) =>{
-    const card = document.createElement("div");
-      card.classList.add("card");
+fetchCarousel(customeUrl("movie", "upcoming"));
 
-      const img = document.createElement("img");
+// carousel movie information data
+const movie_Info = (title, overview, language, popularity, release) => {
+  const moviefragment = document.createDocumentFragment();
 
-      if (contentType === "movie") {
-        img.src = imageURL(item.backdrop_path);
-      } else if (contentType === "person") {
-        img.src = imageURL(item.profile_path);
-      } else if (contentType === "tv") {
-        img.src = imageURL(item.backdrop_path);
-      }
+  const movieDetails = document.createElement("div");
+  movieDetails.classList.add("movie-details");
 
-      img.alt = contentType === "movie" ? "Movie Poster" : "Person Poster";
-      img.loading = "lazy";
+  const movieTitle = document.createElement("h1");
+  movieTitle.classList.add("title");
+  let titleWords = title.split(" ");
+  if (titleWords.length > 5) {
+    movieTitle.textContent = titleWords.slice(0, 6).join(" ") + "...";
+  } else {
+    movieTitle.textContent = title;
+  }
 
-      const movieRating = document.createElement("p");
-      movieRating.classList.add("movie-rating");
-      if (item.vote_average && item.vote_average !== 0) {
-        movieRating.textContent = item.vote_average.toFixed(1);
-      } else {
-        movieRating.textContent = "";
-      }
+  const movieOverview = document.createElement("h3");
+  movieOverview.classList.add("overview");
+  let words = overview.split(" ");
+  if (words.length > 20) {
+    movieOverview.textContent = words.slice(0, 20).join(" ") + "...";
+  } else {
+    movieOverview.textContent = words;
+  }
 
-      const movieLang = document.createElement("p");
-      movieLang.classList.add("movie-language");
-      movieLang.textContent = item.original_language;
+  const movieGenre = document.createElement("div");
+  movieGenre.classList.add("genre");
 
-      const movieTitle = document.createElement("h4");
-      movieTitle.classList.add("cardTitle");
-      movieTitle.textContent = contentType === "movie" ? item.title : item.name;
+  // movie list
+  const movielist = document.createElement("ul");
 
-      const watchingnowContainer = document.createElement("div");
-      watchingnowContainer.classList.add("watchContainer");
+  const movie_lang = document.createElement("li");
+  movie_lang.classList.add("language");
 
-      const watchNowText = document.createElement("p");
-      watchNowText.classList.add("watch-now");
+  const languageMap = {
+    hi: "Hindi",
+    en: "English",
+    ta: "Tamil",
+    te: "Telugu",
+    kn: "Kannada",
+    bn: "Bengali",
+  };
 
-      const watchHeading = document.createElement("p");
-      watchHeading.classList.add("watch-heading");
-      watchHeading.textContent = "watching now";
+  const languages = languageMap[language] || language;
 
-      if (contentType === "person") {
-        watchingnowContainer.style.display = "none";
-      }
+  movie_lang.textContent = `Language - ${languages}`;
 
-      if (item.vote_count <= 0) {
-        watchHeading.textContent = "To be Released";
-        watchNowText.textContent = `${(item.vote_count * 3)
-          .toString()
-          .slice(0, 3)}k`;
-      } else {
-        watchNowText.textContent = `${(item.vote_count * 3)
-          .toString()
-          .slice(0, 3)}k`;
-      }
+  const movie_popularity = document.createElement("li");
+  movie_popularity.classList.add("popularity");
+  movie_popularity.textContent = `Views - ${popularity}M`;
 
-      watchingnowContainer.append(watchNowText, watchHeading);
+  const movie_release = document.createElement("li");
+  movie_release.classList.add("release");
+  movie_release.textContent = `Release on - ${release}`;
 
-      card.appendChild(img);
-      card.appendChild(movieRating);
-      card.appendChild(movieLang);
-      card.appendChild(movieTitle);
-      card.appendChild(watchingnowContainer);
+  movielist.append(movie_lang, movie_popularity, movie_release);
 
-      return card
+  movieGenre.appendChild(movielist);
 
+  movieDetails.append(movieTitle, movieOverview, movieGenre);
+
+  return movieDetails;
+};
+
+// Carousel button Logic
+let currentIndex = 0;
+
+function showNextImage() {
+  const slides = document.querySelectorAll(".slide");
+  slides[currentIndex].classList.remove("active");
+
+  currentIndex = (currentIndex + 1) % slides.length;
+
+  slides[currentIndex].classList.add("active");
 }
+
+function showPrevImage() {
+  const slides = document.querySelectorAll(".slide");
+  slides[currentIndex].classList.remove("active");
+
+  currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+
+  slides[currentIndex].classList.add("active");
+}
+
+let carouselInterval;
+
+const startInterval = () => {
+  carouselInterval = setInterval(showNextImage, 5000);
+};
+
+const stopInterval = () => {
+  clearInterval(carouselInterval);
+};
+
+nextBtn.addEventListener("click", () => {
+  stopInterval();
+  showNextImage();
+  startInterval();
+});
+
+prevBtn.addEventListener("click", () => {
+  stopInterval();
+  showPrevImage();
+  startInterval();
+});
+
+// const searchUrl = (category, type, query)=>{
+//   const defaultUrl = `${API_URL}${category}/${type}?query=${query}&include_adult=false&language=en-US&page=1&api_key=${API_KEY}`
+//   return defaultUrl
+// }
+
+// const fetchSearchData = async (url) =>{
+//   try{
+//     const response = await fetch(url)
+//     if(!response.ok){
+//       throw new Error("Error");
+
+//     }
+//     const data = await response.json()
+//     const result = data.results
+//     console.log(result)
+//   }catch (error){
+//     console.log("there is a error")
+//   }
+// }
+// document.addEventListener("DOMContentLoaded",()=>{
+//   const searchInput = document.querySelector('.search-input');
+//   let timeout;
+//   if(searchInput){
+//     searchInput.addEventListener("input", (event) => {
+//       clearTimeout(timeout);
+
+//         timeout = setTimeout(() => {
+//           console.log("Final input value:", event.target.value);
+//         }, 1000);
+//       const searchValue = event.target.value
+//       if(searchValue === ""){
+//         console.log([]);  }
+//         else{
+//           fetchSearchData(searchUrl("search","keyword", searchValue))
+//         }
+//       });
+//   }
+//   else{
+//     console.log("error")
+//   }
+
+//   })

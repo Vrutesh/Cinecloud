@@ -402,10 +402,18 @@ body {
     object-fit: cover;
     border-radius: 20px;
     transition: transform 0.5s ease-in-out;
+    position: relative;
 
     &:hover {
       transform: scale(1.06);
     }
+  }
+
+  .movie-rating {
+    position: absolute;
+    bottom: 30%;
+    padding-left: 0.5%;
+    color: #ffc305;
   }
 
   .cardTitle {
@@ -416,19 +424,6 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  .movie-rating {
-    position: absolute;
-    bottom: 25%;
-    padding-left: 1%;
-    color: #ffc305;
-  }
-
-  .movie-language{
-    position: absolute;
-    top: 1%;
-    background: linear-gradient(to right, lightblue, darkblue);
   }
 
   .watchContainer {
