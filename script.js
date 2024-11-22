@@ -109,14 +109,21 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
         watchingnowContainer.style.display = "none";
       }
 
-      if (item.vote_count <= 0) {
-        watchHeading.textContent = "To be Released";
-        watchNowText.style.display = "none"
-      } else {
-        watchNowText.textContent = `${(item.vote_count * 3)
-          .toString()
-          .slice(0, 3)}k`;
-      }
+      if(categoryName === "Most Watching Trending Now"){
+        if (item.vote_count <= 0) {
+          watchHeading.textContent = "To be Released";
+          watchNowText.style.display = "none"
+        } else {
+          watchNowText.textContent = `${(item.vote_count * 3)
+            .toString()
+            .slice(0, 3)}k`;
+          }
+        }
+        else{
+          watchHeading.style.display = "none";
+          watchNowText.style.display = "none"
+
+        }
 
       watchingnowContainer.append(watchNowText, watchHeading);
 
@@ -146,6 +153,11 @@ const fetchDataInOrder = async () => {
     "Upcoming Movies"
   );
   await fetchCardData(
+    customeUrl("movie", "now_playing"),
+    "movie",
+    "Most Watching Trending Now"
+  );
+  await fetchCardData(
     customeUrl("movie", "popular"),
     "movie",
     "Popular Movies"
@@ -156,11 +168,6 @@ const fetchDataInOrder = async () => {
     "TV Shows Airing Today"
   );
   await fetchCardData(customeUrl("tv", "popular"), "tv", "Popular TV Shows");
-  await fetchCardData(
-    customeUrl("movie", "now_playing"),
-    "movie",
-    "Now Playing Movies"
-  );
   await fetchCardData(
     customeUrl("person", "popular"),
     "person",
@@ -185,7 +192,7 @@ const createCategoryHeading = (categoryName) => {
     categoryHeading.id = "popular";
   } else if (categoryName === "Top Rated TV Shows") {
     categoryHeading.id = "tvshows";
-  } else if (categoryName === "Now Playing Movies") {
+  } else if (categoryName === "Most Watching Trending Now") {
     categoryHeading.id = "now-playing";
   }
 
