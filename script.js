@@ -3,8 +3,9 @@ const API_KEY = "f3fbd38c0c00cefd4bd7ffeb48aa7a17";
 const API_URL = "https://api.themoviedb.org/3/";
 
 // Main Containers
-
 const cardsSection = document.querySelector(".cards-section");
+const carousel = document.querySelector(".carousel");
+
 
 // Carousel
 const prevBtn = document.querySelector(".prev-btn");
@@ -49,7 +50,12 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
     }
 
     //  Featuring Section
+    if (categoryName === "Popular Movies") {
+      const featuring_container = createFeatureSection();
+      cardsSection.appendChild(featuring_container);
+    }
 
+    // creating cards
     const cardsWrapper = document.createElement("div");
     cardsWrapper.classList.add("card-container");
 
@@ -62,9 +68,6 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
       if (contentType === "movie" && !item.backdrop_path) continue;
       if (contentType === "person" && !item.profile_path) continue;
       if (contentType === "tv" && !item.backdrop_path) continue;
-
-      const cardHolder = document.createElement("div");
-      cardHolder.classList.add("card-holder");
 
       const card = document.createElement("div");
       card.classList.add("card");
@@ -89,11 +92,10 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
       } else {
         movieRating.textContent = "";
       }
-      
+
       const movieTitle = document.createElement("h4");
       movieTitle.classList.add("cardTitle");
       movieTitle.textContent = contentType === "movie" ? item.title : item.name;
-      
 
       const watchingnowContainer = document.createElement("div");
       watchingnowContainer.classList.add("watchContainer");
@@ -109,35 +111,24 @@ const fetchCardData = async (apiUrl, contentType, categoryName) => {
         watchingnowContainer.style.display = "none";
       }
 
-      if(categoryName === "Most Watching Trending Now"){
-        if (item.vote_count <= 0) {
-          watchHeading.textContent = "To be Released";
-          watchNowText.style.display = "none"
-        } else {
-          watchNowText.textContent = `${(item.vote_count * 3)
-            .toString()
-            .slice(0, 3)}k`;
-          }
-        }
-        else{
-          watchHeading.style.display = "none";
-          watchNowText.style.display = "none"
-
-        }
+      if (item.vote_count <= 0) {
+        watchHeading.textContent = "To be Released";
+        watchNowText.style.display = "none";
+      } else {
+        watchNowText.textContent = `${(item.vote_count * 3)
+          .toString()
+          .slice(0, 3)}k`;
+      }
 
       watchingnowContainer.append(watchNowText, watchHeading);
 
-
-      card.appendChild(img);
-      card.appendChild(movieRating);
-      card.appendChild(movieTitle);
-      card.appendChild(watchingnowContainer);
-      cardHolder.appendChild(card);
-      fragment.appendChild(cardHolder);
+      card.append(img, movieRating, movieTitle, watchingnowContainer);
+      content.appendChild(card);
+      fragment.appendChild(content);
     }
 
-    content.appendChild(fragment);
-    cardsWrapper.appendChild(content);
+    // content.appendChild(fragment);
+    cardsWrapper.appendChild(fragment);
     mainContainer.appendChild(cardsWrapper);
     cardsSection.appendChild(mainContainer);
   } catch (error) {
@@ -249,8 +240,6 @@ const createFeatureSection = () => {
 };
 
 // fetching carousel data
-
-const carousel = document.querySelector(".carousel");
 
 const fetchCarousel = async (url) => {
   try {
@@ -411,45 +400,57 @@ prevBtn.addEventListener("click", () => {
   startInterval();
 });
 
-// const searchUrl = (category, type, query)=>{
-//   const defaultUrl = `${API_URL}${category}/${type}?query=${query}&include_adult=false&language=en-US&page=1&api_key=${API_KEY}`
-//   return defaultUrl
-// }
+//search bar
 
-// const fetchSearchData = async (url) =>{
-//   try{
-//     const response = await fetch(url)
-//     if(!response.ok){
-//       throw new Error("Error");
+const searchUrl = (category, type, query) => {
+  const defaultUrl = `${API_URL}${category}/${type}?query=${query}&include_adult=false&language=en-US&page=1&api_key=${API_KEY}`;
+  return defaultUrl;
+};
 
-//     }
-//     const data = await response.json()
-//     const result = data.results
-//     console.log(result)
-//   }catch (error){
-//     console.log("there is a error")
-//   }
-// }
-// document.addEventListener("DOMContentLoaded",()=>{
-//   const searchInput = document.querySelector('.search-input');
-//   let timeout;
-//   if(searchInput){
-//     searchInput.addEventListener("input", (event) => {
-//       clearTimeout(timeout);
+const fetchSearchData = async (url) => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Error");
+    }
+    const data = await response.json();
+    const result = data.results;
+    console.log(result);
+  } catch (error) {
+    console.log("there is a error");
+  }
+};
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.querySelector(".search-input");
+  let timeout;
+  if (searchInput) {
+    searchInput.addEventListener("input", (event) => {
+      clearTimeout(timeout);
 
-//         timeout = setTimeout(() => {
-//           console.log("Final input value:", event.target.value);
-//         }, 1000);
-//       const searchValue = event.target.value
-//       if(searchValue === ""){
-//         console.log([]);  }
-//         else{
-//           fetchSearchData(searchUrl("search","keyword", searchValue))
-//         }
-//       });
-//   }
-//   else{
-//     console.log("error")
-//   }
+      timeout = setTimeout(() => {
+        console.log("Final input value:", event.target.value);
+      }, 1000);
+      const searchValue = event.target.value;
+      // getting main container like cards, carousel and footer container 
 
-//   })
+      let carouselContainer = document.querySelector(".container");
+      let allCards = document.querySelector(".cards-section");
+      let footer = document.querySelector("#footer");
+      
+      if (searchValue === "") {
+        console.log([]);
+        carouselContainer.style.display = "block";
+        footer.style.display = "block";
+        allCards.style.display = "block";
+      } else {
+        fetchSearchData(searchUrl("search", "keyword", searchValue));
+
+        carouselContainer.style.display = "none";
+        footer.style.display = "none";
+        allCards.style.display = "none";
+      }
+    });
+  } else {
+    console.log("error");
+  }
+});
