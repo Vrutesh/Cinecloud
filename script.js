@@ -6,7 +6,6 @@ const API_URL = "https://api.themoviedb.org/3/";
 const cardsSection = document.querySelector(".cards-section");
 const carousel = document.querySelector(".carousel");
 
-
 // Carousel
 const prevBtn = document.querySelector(".prev-btn");
 prevBtn.setAttribute("aria-label", "Previous slide");
@@ -400,7 +399,50 @@ prevBtn.addEventListener("click", () => {
   startInterval();
 });
 
-//search bar
+//search bar feature
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.querySelector(".search-input");
+  let timeout;
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (event) => {
+      clearTimeout(timeout); // Clear previous timeout
+
+      timeout = setTimeout(() => {
+        const searchValue = event.target.value;
+
+        // Getting containers
+        let carouselContainer = document.querySelector(".container");
+        let allCards = document.querySelector(".cards-section");
+        let graident = document.querySelector(".masthead-gradient");
+        let footer = document.querySelector("#footer");
+        let searchcontainer = document.querySelector(".results-container");
+
+        // Handle empty search value
+        if (searchValue === "") {
+          console.log([]);
+          carouselContainer.style.display = "block";
+          footer.style.display = "block";
+          allCards.style.display = "block";
+          graident.style.display = "block";
+          searchcontainer.classList.remove("active");        
+
+        } else {
+          // Make API call to fetch search results
+          fetchSearchData(searchUrl("search", "movie", searchValue));
+
+          carouselContainer.style.display = "none";
+          footer.style.display = "none";
+          allCards.style.display = "none";
+          graident.style.display = "none";
+          searchcontainer.classList.add("active");        
+        }
+      }, 1000); // Delay after typing stops
+    });
+  } else {
+    console.log("Search input not found");
+  }
+});
 
 const searchUrl = (category, type, query) => {
   const defaultUrl = `${API_URL}${category}/${type}?query=${query}&include_adult=false&language=en-US&page=1&api_key=${API_KEY}`;
@@ -415,42 +457,37 @@ const fetchSearchData = async (url) => {
     }
     const data = await response.json();
     const result = data.results;
-    console.log(result);
+  
+    displaySearchResults(result);
   } catch (error) {
-    console.log("there is a error");
+    console.error("Error fetching data:", error);
   }
 };
-document.addEventListener("DOMContentLoaded", () => {
-  const searchInput = document.querySelector(".search-input");
-  let timeout;
-  if (searchInput) {
-    searchInput.addEventListener("input", (event) => {
-      clearTimeout(timeout);
+// Display search results as movie cards
+const displaySearchResults = (result) => {
+  const resultsContainer = document.querySelector(".results-container");
+  resultsContainer.innerHTML = ""; // Clear any previous results
 
-      timeout = setTimeout(() => {
-        console.log("Final input value:", event.target.value);
-      }, 1000);
-      const searchValue = event.target.value;
-      // getting main container like cards, carousel and footer container 
-
-      let carouselContainer = document.querySelector(".container");
-      let allCards = document.querySelector(".cards-section");
-      let footer = document.querySelector("#footer");
-      
-      if (searchValue === "") {
-        console.log([]);
-        carouselContainer.style.display = "block";
-        footer.style.display = "block";
-        allCards.style.display = "block";
-      } else {
-        fetchSearchData(searchUrl("search", "keyword", searchValue));
-
-        carouselContainer.style.display = "none";
-        footer.style.display = "none";
-        allCards.style.display = "none";
-      }
-    });
+  if (result.length === 0) {
+    const noResultsMessage = document.createElement("p");
+    noResultsMessage.textContent = "No results found!";
+    resultsContainer.appendChild(noResultsMessage);
   } else {
-    console.log("error");
+    result.forEach((movie) => {
+      
+      if (movie.poster_path) {
+        const resultmovieCard = document.createElement("div");
+        resultmovieCard.classList.add("movie-card");
+        const resultmoviePoster = document.createElement("img");
+        resultmoviePoster.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+        resultmoviePoster.alt = movie.title;
+        resultmovieCard.appendChild(resultmoviePoster);
+        const resultmovieTitle = document.createElement("h3");
+        resultmovieTitle.textContent = movie.title;
+        resultmovieCard.appendChild(resultmovieTitle);
+        resultsContainer.appendChild(resultmovieCard);
+      }
+
+    });
   }
-});
+};
