@@ -183,7 +183,7 @@ body {
   }
 }
 
-.clear-btn{
+.clear-btn {
   position: absolute;
   right: 5%;
   background-color: transparent;
@@ -192,11 +192,11 @@ body {
   transition: transform 0.3s ease-in-out;
 }
 
-.clear-btn:active{
+.clear-btn:active {
   transform: scale(0.7);
 }
 
-.clear-btn i{
+.clear-btn i {
   font-size: 1.1rem;
   color: $blue-color;
 }
@@ -215,6 +215,8 @@ body {
 
 .results-container {
   display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .results-container.active {
@@ -227,6 +229,7 @@ body {
   scrollbar-width: none;
   padding: 20px 10px;
   gap: 40px;
+  opacity: 1;
 }
 
 .movie-card {
@@ -253,6 +256,20 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.clear-result {
+  position: absolute;
+  top: 10%;
+  right: 2%;
+  background-color: transparent;
+  outline: none;
+  border: none;
+}
+
+.clear-result i {
+  font-size: 2rem;
+  color: $white-color;
 }
 
 /* Hero section */

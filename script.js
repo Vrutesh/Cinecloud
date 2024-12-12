@@ -396,7 +396,9 @@ prevBtn.addEventListener("click", () => {
 
 //search bar feature
 document.addEventListener("DOMContentLoaded", () => {
-  const searchInput = document.querySelector(".search-input");
+  let searchInput = document.querySelector(".search-input");
+
+  // if search is not there
   if (!searchInput) {
     console.error("Search input not found!");
     return; // Exit if the search input is not found
@@ -404,21 +406,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const loader = document.querySelector(".loader");
   const carouselContainer = document.querySelector(".container");
+  const clearBtn = document.querySelector(".clear-btn");
   const allCards = document.querySelector(".cards-section");
   const graident = document.querySelector(".masthead-gradient");
   const footer = document.querySelector("#footer");
   const searchcontainer = document.querySelector(".results-container");
-  const clearBtn = document.querySelector('.clear-btn')
+  const clearresultContainer = document.querySelector(".clear-result");
+  clearresultContainer.style.display = "none";
 
-  // Ensure loader is hidden initially
+  // loader is hidden initially
   const hideLoader = () => loader.classList.remove("active");
   const showLoader = () => loader.classList.add("active");
+
+  // clear button is hidden initially
+  clearBtn.style.display = "none";
+
+  clearresultContainer.addEventListener("click", () => {
+    searchInput.value = "";
+    hideLoader();
+    carouselContainer.style.display = "block";
+    footer.style.display = "block";
+    allCards.style.display = "block";
+    graident.style.display = "block";
+    searchcontainer.classList.remove("active");
+    clearBtn.style.display = "none";
+  });
+  // Clear input field
+  const resetSearchState = () => {
+    searchInput.value = "";
+    hideLoader();
+    carouselContainer.style.display = "block";
+    footer.style.display = "block";
+    allCards.style.display = "block";
+    graident.style.display = "block";
+    searchcontainer.classList.remove("active");
+    clearBtn.style.display = "none";
+  };
+
+  // Clear button event listener
+  clearBtn.addEventListener("click", () => {
+    resetSearchState();
+  });
 
   searchInput.addEventListener("focus", () => {
     carouselContainer.style.display = "none";
     footer.style.display = "none";
     allCards.style.display = "none";
     graident.style.display = "none";
+    clearresultContainer.style.display = "block";
   });
 
   if (!searchcontainer) {
@@ -434,21 +469,20 @@ document.addEventListener("DOMContentLoaded", () => {
   searchInput.addEventListener("input", (event) => {
     clearTimeout(timeout);
     // hideLoader();
+    clearBtn.style.display = "block";
     showLoader();
     timeout = setTimeout(() => {
-      const searchValue = event.target.value;
-      clearBtn.addEventListener("click",()=>{
-        searchValue == ""
-      })
+      let searchValue = event.target.value;
+
       if (searchValue === "") {
         hideLoader();
+        clearBtn.style.display = "none";
         carouselContainer.style.display = "block";
         footer.style.display = "block";
         allCards.style.display = "block";
         graident.style.display = "block";
         searchcontainer.classList.toggle("active", false);
       } else {
-        
         carouselContainer.style.display = "none";
         footer.style.display = "none";
         allCards.style.display = "none";
@@ -458,7 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Fetch search results
         fetchSearchData(searchUrl("search", "movie", searchValue));
       }
-    }, 1000); // Delay after typing stops
+    }, 400); // Delay after typing stops
   });
 
   const searchUrl = (category, type, query) =>
@@ -509,5 +543,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 });
-
-
