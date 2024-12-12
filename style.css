@@ -215,7 +215,8 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
   padding: 20px 10px;
-  gap: 40px;
+  margin-top: 100px;
+  gap: 10px;
   opacity: 1;
 }
 
@@ -224,7 +225,6 @@ body {
   flex-direction: column;
   width: 180px;
   height: auto;
-  margin-top: 100px;
 }
 
 .movie-card img {
@@ -234,6 +234,11 @@ body {
      object-fit: cover;
   cursor: pointer;
   border-radius: 20px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.movie-card img:hover {
+  transform: scale(1.05);
 }
 
 .movie-card h3 {

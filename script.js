@@ -228,6 +228,7 @@ const createFeatureSection = () => {
   const poster_img = document.createElement("img");
   poster_img.src = "assets/movie-poster.webp";
   poster_img.alt = "movie-poster";
+  poster_img.loading = "lazy";
 
   poster_container.appendChild(poster_img);
   featuring_container.append(video_container, poster_container);
@@ -520,7 +521,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (result.length === 0) {
       const noResultsMessage = document.createElement("p");
-      noResultsMessage.textContent = "No results found!";
+      noResultsMessage.textContent = "Opps ! No results found!";
+      noResultsMessage.style.color = "#fff";
       resultsContainer.appendChild(noResultsMessage);
     } else {
       result.forEach((movie) => {
@@ -531,6 +533,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const resultmoviePoster = document.createElement("img");
           resultmoviePoster.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
           resultmoviePoster.alt = movie.title;
+          resultmoviePoster.loading = "lazy";
           resultmovieCard.appendChild(resultmoviePoster);
 
           const resultmovieTitle = document.createElement("h3");
