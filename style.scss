@@ -7,6 +7,7 @@
 }
 
 $white-color: #fff;
+$blue-color: #0071e2;
 
 html {
   scroll-behavior: smooth;
@@ -37,6 +38,46 @@ html {
 /* Body styles */
 body {
   background-color: #151515;
+}
+
+// loader css
+.loader {
+  display: none;
+}
+
+.loader.active {
+  display: block;
+  color: $blue-color;
+  width: 130px;
+  height: 4px;
+  border-radius: 30px;
+  background-color: rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 50%;
+}
+
+.loader.active::before {
+  content: "";
+  position: absolute;
+  background: $blue-color;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  border-radius: 30px;
+  animation: moving 1s ease-in-out infinite;
+}
+
+@keyframes moving {
+  50% {
+    width: 100%;
+  }
+
+  100% {
+    width: 0;
+    right: 0;
+    left: unset;
+  }
 }
 
 /* Navigation styles */
@@ -123,6 +164,8 @@ body {
 .search-container {
   position: relative;
   width: 300px;
+  display: flex;
+  align-items: center;
 }
 
 .search-input {
@@ -138,6 +181,24 @@ body {
     color: #999;
     font-style: italic;
   }
+}
+
+.clear-btn{
+  position: absolute;
+  right: 5%;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  transition: transform 0.3s ease-in-out;
+}
+
+.clear-btn:active{
+  transform: scale(0.7);
+}
+
+.clear-btn i{
+  font-size: 1.1rem;
+  color: $blue-color;
 }
 
 .avatar {

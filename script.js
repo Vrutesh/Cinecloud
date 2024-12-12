@@ -173,7 +173,6 @@ const fetchDataInOrder = async () => {
 fetchDataInOrder();
 
 // creating movie type heading
-
 const createCategoryHeading = (categoryName) => {
   const categoryHeading = document.createElement("h3");
   categoryHeading.textContent = categoryName;
@@ -197,7 +196,6 @@ const createGradientOverlay = () => {
 };
 
 // create right arrow
-
 const createRightArrow = () => {
   const rightArrow = document.createElement("img");
   rightArrow.classList.add("right-arrow");
@@ -208,7 +206,6 @@ const createRightArrow = () => {
 };
 
 //   create featuring section
-
 const createFeatureSection = () => {
   const featuring_container = document.createElement("section");
   featuring_container.classList.add("featuring-container");
@@ -239,7 +236,6 @@ const createFeatureSection = () => {
 };
 
 // fetching carousel data
-
 const fetchCarousel = async (url) => {
   try {
     const response = await fetch(url);
@@ -289,7 +285,6 @@ const fetchCarousel = async (url) => {
     console.log("There is an error in fetching data:", error);
   }
 };
-
 fetchCarousel(customeUrl("movie", "upcoming"));
 
 // carousel movie information data
@@ -402,92 +397,117 @@ prevBtn.addEventListener("click", () => {
 //search bar feature
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.querySelector(".search-input");
-  let timeout;
-
-  if (searchInput) {
-    searchInput.addEventListener("input", (event) => {
-      clearTimeout(timeout); // Clear previous timeout
-
-      timeout = setTimeout(() => {
-        const searchValue = event.target.value;
-
-        // Getting containers
-        let carouselContainer = document.querySelector(".container");
-        let allCards = document.querySelector(".cards-section");
-        let graident = document.querySelector(".masthead-gradient");
-        let footer = document.querySelector("#footer");
-        let searchcontainer = document.querySelector(".results-container");
-
-        // Handle empty search value
-        if (searchValue === "") {
-          console.log([]);
-          carouselContainer.style.display = "block";
-          footer.style.display = "block";
-          allCards.style.display = "block";
-          graident.style.display = "block";
-          searchcontainer.classList.remove("active");        
-
-        } else {
-          // Make API call to fetch search results
-          fetchSearchData(searchUrl("search", "movie", searchValue));
-
-          carouselContainer.style.display = "none";
-          footer.style.display = "none";
-          allCards.style.display = "none";
-          graident.style.display = "none";
-          searchcontainer.classList.add("active");        
-        }
-      }, 1000); // Delay after typing stops
-    });
-  } else {
-    console.log("Search input not found");
+  if (!searchInput) {
+    console.error("Search input not found!");
+    return; // Exit if the search input is not found
   }
+
+  const loader = document.querySelector(".loader");
+  const carouselContainer = document.querySelector(".container");
+  const allCards = document.querySelector(".cards-section");
+  const graident = document.querySelector(".masthead-gradient");
+  const footer = document.querySelector("#footer");
+  const searchcontainer = document.querySelector(".results-container");
+  const clearBtn = document.querySelector('.clear-btn')
+
+  // Ensure loader is hidden initially
+  const hideLoader = () => loader.classList.remove("active");
+  const showLoader = () => loader.classList.add("active");
+
+  searchInput.addEventListener("focus", () => {
+    carouselContainer.style.display = "none";
+    footer.style.display = "none";
+    allCards.style.display = "none";
+    graident.style.display = "none";
+  });
+
+  if (!searchcontainer) {
+    searchInput.addEventListener("blur", () => {
+      carouselContainer.style.display = "block";
+      footer.style.display = "block";
+      allCards.style.display = "block";
+      graident.style.display = "block";
+    });
+  }
+
+  let timeout;
+  searchInput.addEventListener("input", (event) => {
+    clearTimeout(timeout);
+    // hideLoader();
+    showLoader();
+    timeout = setTimeout(() => {
+      const searchValue = event.target.value;
+      clearBtn.addEventListener("click",()=>{
+        searchValue == ""
+      })
+      if (searchValue === "") {
+        hideLoader();
+        carouselContainer.style.display = "block";
+        footer.style.display = "block";
+        allCards.style.display = "block";
+        graident.style.display = "block";
+        searchcontainer.classList.toggle("active", false);
+      } else {
+        
+        carouselContainer.style.display = "none";
+        footer.style.display = "none";
+        allCards.style.display = "none";
+        graident.style.display = "none";
+        searchcontainer.classList.toggle("active", true);
+
+        // Fetch search results
+        fetchSearchData(searchUrl("search", "movie", searchValue));
+      }
+    }, 1000); // Delay after typing stops
+  });
+
+  const searchUrl = (category, type, query) =>
+    `${API_URL}${category}/${type}?query=${query}&include_adult=false&language=en-US&page=1&api_key=${API_KEY}`;
+
+  const fetchSearchData = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Error fetching search data");
+      }
+      const data = await response.json();
+      const result = data.results;
+      hideLoader();
+      displaySearchResults(result);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      hideLoader();
+    }
+  };
+
+  const displaySearchResults = (result) => {
+    const resultsContainer = document.querySelector(".results-container");
+    resultsContainer.innerHTML = ""; // Clear previous results
+
+    if (result.length === 0) {
+      const noResultsMessage = document.createElement("p");
+      noResultsMessage.textContent = "No results found!";
+      resultsContainer.appendChild(noResultsMessage);
+    } else {
+      result.forEach((movie) => {
+        if (movie.poster_path) {
+          const resultmovieCard = document.createElement("div");
+          resultmovieCard.classList.add("movie-card");
+
+          const resultmoviePoster = document.createElement("img");
+          resultmoviePoster.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+          resultmoviePoster.alt = movie.title;
+          resultmovieCard.appendChild(resultmoviePoster);
+
+          const resultmovieTitle = document.createElement("h3");
+          resultmovieTitle.textContent = movie.title;
+          resultmovieCard.appendChild(resultmovieTitle);
+
+          resultsContainer.appendChild(resultmovieCard);
+        }
+      });
+    }
+  };
 });
 
-const searchUrl = (category, type, query) => {
-  const defaultUrl = `${API_URL}${category}/${type}?query=${query}&include_adult=false&language=en-US&page=1&api_key=${API_KEY}`;
-  return defaultUrl;
-};
 
-const fetchSearchData = async (url) => {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Error");
-    }
-    const data = await response.json();
-    const result = data.results;
-  
-    displaySearchResults(result);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-};
-// Display search results as movie cards
-const displaySearchResults = (result) => {
-  const resultsContainer = document.querySelector(".results-container");
-  resultsContainer.innerHTML = ""; // Clear any previous results
-
-  if (result.length === 0) {
-    const noResultsMessage = document.createElement("p");
-    noResultsMessage.textContent = "No results found!";
-    resultsContainer.appendChild(noResultsMessage);
-  } else {
-    result.forEach((movie) => {
-      
-      if (movie.poster_path) {
-        const resultmovieCard = document.createElement("div");
-        resultmovieCard.classList.add("movie-card");
-        const resultmoviePoster = document.createElement("img");
-        resultmoviePoster.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-        resultmoviePoster.alt = movie.title;
-        resultmovieCard.appendChild(resultmoviePoster);
-        const resultmovieTitle = document.createElement("h3");
-        resultmovieTitle.textContent = movie.title;
-        resultmovieCard.appendChild(resultmovieTitle);
-        resultsContainer.appendChild(resultmovieCard);
-      }
-
-    });
-  }
-};
